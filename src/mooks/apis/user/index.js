@@ -8,7 +8,16 @@ class User {
 
   getUser(id) {
     const ind = this.user.findIndex((item) => item.id === id);
+    console.log(ind);
     if (ind < 0) return undefined;
+    return fakePromise(this.user[ind]);
+  }
+
+  getUserName(username, password) {
+    const ind = this.user.findIndex((item) => item.username === username);
+
+    if (ind < 0) return fakePromise(undefined, 'username sai');
+    if (this.user[ind].password !== password) return fakePromise(undefined, 'password sai');
     return fakePromise(this.user[ind]);
   }
 

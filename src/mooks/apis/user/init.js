@@ -8,6 +8,11 @@ const userData = [
     id: 2,
     username: 'admin',
     password: 'admin',
+  },
+  {
+    id: 3,
+    username: 'duong',
+    password: '@Abc_123@',
   }
 ];
 

@@ -7,11 +7,10 @@ const MainHook = (props) => {
             <h1>Main Hook</h1>
 
             <button onClick={ () => {
-                localStorage.removeItem("jwtToken");
                 props.onLogoutSuccess();
             }} 
             >
-             Logout
+             Log Out
             </button>
         </div>
     )
