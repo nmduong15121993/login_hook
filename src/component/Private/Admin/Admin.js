@@ -1,15 +1,16 @@
-import React from "react";
-import { 
-  Container,
-  Row,
-  Col,
+import {
   Button,
+  Col,
+  Container,
   Label,
   Modal,
-  ModalHeader,
   ModalBody,
-  ModalFooter } from "reactstrap";
+  ModalFooter,
+  ModalHeader,
+  Row
+} from "reactstrap";
 
+import React from "react";
 import { feeds } from "./../../../mooks";
 
 const Admin = ({ onLogoutSuccess, accountInfo }) => {
@@ -21,7 +22,6 @@ const Admin = ({ onLogoutSuccess, accountInfo }) => {
     const fnPromise = async () => {
       try {
         const dataFeeds = await feeds.getFeeds();
-        // console.log(dataFeeds);
         setDataFeeds(dataFeeds);
       } catch (error) {
         console.log(error);
@@ -32,24 +32,14 @@ const Admin = ({ onLogoutSuccess, accountInfo }) => {
   }, []);
 
 
-  const onHandleDelete = (id) => {
-    // console.log(id);
-    const ind = dataFeeds.findIndex((item) => item.id === id);
-    // console.log(ind);
-
-    dataFeeds.splice(ind, 1);
-    const fnPromise = async () => {
-      try {
-        const data = await feeds.removeFeed(id);
-        // console.log(dataFeeds);
-        
-        setDataFeeds(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-      }
-    };
-    fnPromise();
+  const onHandleDelete = async (id) => {
+    try {
+      const idDeleted = await feeds.removeFeed(id);
+      setDataFeeds(dataFeeds.filter((item) => item.id !== idDeleted));
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
   }
 
   return (
@@ -77,7 +67,6 @@ const Admin = ({ onLogoutSuccess, accountInfo }) => {
       ) : (
         <></>
       )}
-
       {dataFeeds.map((data) => (
         <Container key={data.id}>
           <Row>

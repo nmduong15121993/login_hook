@@ -1,4 +1,5 @@
-import { posts, getIDPost} from './init';
+import { getIDPost, posts } from './init';
+
 import { fakePromise } from '../helper';
 
 class Feeds {
@@ -46,15 +47,11 @@ class Feeds {
   }
 
   removeFeed(id) {
-    console.log(id);
-    console.log(this.posts);
     const indPosts = !id ? -1 : this.posts.findIndex((post) => post.id === id);
 
-    console.log(indPosts);
     if (indPosts < 0) return fakePromise(undefined, 'ID not found!');
     this.posts.splice(indPosts, 1);
-    // console.log(this.posts);
-    return fakePromise(this.posts);
+    return fakePromise(id);
   }
 }
 
