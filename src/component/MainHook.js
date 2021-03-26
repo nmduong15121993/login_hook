@@ -1,15 +1,12 @@
 import React from 'react';
 
-const MainHook = (props) => {
+const MainHook = ({ onLogoutSuccess }) => {
 
     return (
         <div>
             <h1>Main Hook</h1>
 
-            <button onClick={ () => {
-                props.onLogoutSuccess();
-            }} 
-            >
+            <button onClick={onLogoutSuccess}>
              Log Out
             </button>
         </div>
