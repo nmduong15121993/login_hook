@@ -7,6 +7,13 @@ const userData = [
     avatar: '',
   },
   {
+    id: 4,
+    username: 'a',
+    password: 'a',
+    role: 'user',
+    avatar: '',
+  },
+  {
     id: 2,
     username: 'admin',
     password: 'admin',

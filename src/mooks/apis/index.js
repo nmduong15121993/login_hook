@@ -1,8 +1,7 @@
-import { User } from './user';
 import { Feeds } from './feeds';
+import { User } from './user';
 
 const user = new User();
-export { user };
-
 const feeds = new Feeds();
-export { feeds };
+
+export { user, feeds };

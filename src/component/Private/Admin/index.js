@@ -12,10 +12,11 @@ import {
 } from "reactstrap";
 
 import React from "react";
-import { feeds } from "./../../../mooks";
 import { toast } from 'react-toastify';
+import { user, feeds } from "./../../../mooks";
+import { AuthContext } from '../../../store';
 
-const Admin = ({ onLogoutSuccess, accountInfo}) => {
+const Admin = () => {
   const dataFormEmty = {
     id: null,
     idAuther: null,
@@ -24,6 +25,8 @@ const Admin = ({ onLogoutSuccess, accountInfo}) => {
     description: '',
     detail: ''
   }
+  const { store } = React.useContext(AuthContext);
+  const accountInfo = user.getUser(store.ind);
 
   const [dataFeeds, setDataFeeds] = React.useState([]);
   const [modal, setModal] = React.useState(false);
@@ -112,7 +115,7 @@ const Admin = ({ onLogoutSuccess, accountInfo}) => {
             <h5>Role: {accountInfo.role}</h5>
           </Col>
           <Col xs="6">
-            <Button onClick={onLogoutSuccess} color="danger">
+            <Button onClick={() => {}} color="danger">
               Log Out
             </Button>
           </Col>

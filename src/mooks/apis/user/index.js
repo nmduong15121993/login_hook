@@ -1,14 +1,12 @@
-import { userData } from './init';
 import { fakePromise } from '../helper';
+import { userData } from './init';
 
 class User {
   constructor() {
     this.user = userData;
   }
 
-  getUser(id) {
-    const ind = this.user.findIndex((item) => item.id === id);
-    console.log(ind);
+  getUser(ind) {
     if (ind < 0) return undefined;
     return fakePromise(this.user[ind]);
   }
@@ -18,7 +16,7 @@ class User {
 
     if (ind < 0) return fakePromise(undefined, 'username sai');
     if (this.user[ind].password !== password) return fakePromise(undefined, 'password sai');
-    return fakePromise(this.user[ind]);
+    return fakePromise(ind);
   }
 
   addUser({ id, username, password }) {
