@@ -43,7 +43,7 @@ class Feeds {
     if (indPosts < 0) return fakePromise(undefined, 'ID not found!');
     // Object.assign
     this.posts[indPosts] = { ...this.posts[indPosts], ...data };
-    return fakePromise(data);
+    return fakePromise(this.posts[indPosts]);
   }
 
   removeFeed(id) {

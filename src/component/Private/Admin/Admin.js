@@ -3,22 +3,34 @@ import {
   Col,
   Container,
   Label,
+  Row,
   Modal,
-  ModalBody,
-  ModalFooter,
   ModalHeader,
-  Row
+  ModalBody, 
+  ModalFooter,
+  Input
 } from "reactstrap";
 
 import React from "react";
 import { feeds } from "./../../../mooks";
+import { toast } from 'react-toastify';
 
-const Admin = ({ onLogoutSuccess, accountInfo }) => {
+const Admin = ({ onLogoutSuccess, accountInfo}) => {
+  const dataFormEmty = {
+    id: null,
+    idAuther: null,
+    title: '',
+    img: '',
+    description: '',
+    detail: ''
+  }
+
   const [dataFeeds, setDataFeeds] = React.useState([]);
   const [modal, setModal] = React.useState(false);
+  const [titleForm, setTitleForm] = React.useState('');
+  const [dataForm, setDataForm] = React.useState(dataFormEmty);
 
   React.useEffect(() => {
-    console.log("Did Mount");
     const fnPromise = async () => {
       try {
         const dataFeeds = await feeds.getFeeds();
@@ -36,10 +48,57 @@ const Admin = ({ onLogoutSuccess, accountInfo }) => {
     try {
       const idDeleted = await feeds.removeFeed(id);
       setDataFeeds(dataFeeds.filter((item) => item.id !== idDeleted));
+      toast.success("Deleted Post Successfully", {autoClose: 2000});
     } catch (error) {
       console.log(error);
-    } finally {
+      toast.error(`Delete Post Failer with error code: ${error}`, {autoClose: 5000});
     }
+  }
+
+  const onCreatePost = () => {
+    setTitleForm("Create Post");
+    setModal(true);
+  }
+
+  const onHandleEdit = (data) => {
+    setTitleForm("Edit Post");
+    setDataForm(data);
+    setModal(true);
+  }
+
+  const onSaveFormPost = () => {
+    const { id, idAuther, title, img, description, detail} = dataForm;
+
+    if(id) {
+      const editPost = async () => {
+        try {
+          const data = await feeds.editFeed(dataForm);
+          const index =  dataFeeds.findIndex((dataEdit) => dataEdit.id === data.id);
+          dataFeeds[index] = data;
+          setDataFeeds([...dataFeeds]);
+          toast.success("Updated Post Successfully", {autoClose: 2000});
+        } catch (error) {
+          console.log(error);
+          toast.error(`Update Post Failer with error code: ${error}`, {autoClose: 5000});
+        }
+      };
+      editPost();    
+    }else {
+      const addPost = async () => {
+        try {
+          const data = await feeds.addFeed({idAuther, title, img, description, detail});
+          setDataFeeds([...dataFeeds, data]);
+          toast.success("Created Post Successfully", {autoClose: 2000});
+        } catch (error) {
+          console.log(error);
+          toast.error(`Create Failer with error code: ${error}`, {autoClose: 5000});
+        }
+      };
+      addPost();      
+    }
+    
+    setDataForm(dataFormEmty);
+    setModal(false);
   }
 
   return (
@@ -61,7 +120,7 @@ const Admin = ({ onLogoutSuccess, accountInfo }) => {
       </Container>
       <hr />
       {accountInfo.role === "admin" ? (
-        <Button color="primary" onClick={() => setModal(true)}>
+        <Button color="primary" onClick={() => onCreatePost()}>
           Create POST
         </Button>
       ) : (
@@ -90,49 +149,95 @@ const Admin = ({ onLogoutSuccess, accountInfo }) => {
                   <p>{data.detail}</p>
                 </div>
 
-                <div>
-                  <Label>Comment:</Label>
-                  <br/>
-                  { data.comments.map((comment) => 
-                      <div key={comment.idUser}>
-                        <span>idUser: {comment.idUser} </span>
-                        <span>Content: {comment.content}</span>
-                        <span>Date: {comment.time}</span>
-                        <hr/>
-                      </div>
-                    )
-                  }
-                </div>
-                <div>
-                  <Button color="secondary" >Edit Post</Button>
-                  <Button color="danger" onClick={() => onHandleDelete(data.id)}>Delete Post</Button>
-                </div>
+                {accountInfo.role === "admin" ? ( 
+                    <div>
+                      <Button 
+                        color="secondary" 
+                        onClick={() => onHandleEdit(data)}
+                      >
+                        Edit Post
+                      </Button>
+                      <Button 
+                        color="danger" 
+                        onClick={() => onHandleDelete(data.id)}
+                      >
+                        Delete Post
+                      </Button>
+                    </div>
+
+                     ) : (
+                    <></>
+                )}
                 <hr />
             </Col>
           </Row>
         </Container>
       ))}
 
-      {
-        modal ? 
-        <Modal>
-          <ModalHeader>Modal title</ModalHeader>
+      <div>
+        <Modal isOpen={modal}>
+          <ModalHeader toggle={() => setModal(false)}>{titleForm}</ModalHeader>
           <ModalBody>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            <form>
+              <div>
+                <Label for="exampleAuther">Auther Post</Label>
+                <Input 
+                  type="text" 
+                  name="auther" 
+                  id="exampleAuther"
+                  value={dataForm.idAuther || ''}
+                  onChange={({target}) => setDataForm({ ...dataForm, idAuther: +target.value})} 
+                />                      
+              </div>
+              <div>
+                <Label for="exampleName">Title</Label>
+                <Input 
+                  type="name" 
+                  name="name" 
+                  id="exampleName"
+                  value={dataForm.title || ''}
+                  onChange={({target}) => setDataForm({ ...dataForm, title: target.value})} 
+                />                      
+              </div>
+              <div>
+                <Label for="exampleImg">Link image</Label>
+                <Input 
+                  type="text" 
+                  name="img" 
+                  id="exampleImg"
+                  value={dataForm.img || ''}
+                  onChange={({target}) => setDataForm({ ...dataForm, img: target.value})} 
+                />
+              </div>
+              <div>
+                <Label for="exampleDescription">Description</Label>
+                <Input 
+                  type="textarea" 
+                  name="description" 
+                  id="exampleDescription"
+                  value={dataForm.description || ''}
+                  onChange={({target}) => setDataForm({ ...dataForm, description: target.value})} 
+                />
+              </div>
+              <div>
+                <Label for="exampleDetail">Detail</Label>
+                <Input 
+                  type="textarea" 
+                  name="detail" 
+                  id="exampleDetail"
+                  value={dataForm.detail || ''}
+                  onChange={({target}) => setDataForm({ ...dataForm, detail: target.value})} 
+                />
+              </div>
+            </form>
+
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" >Do Something</Button>
-            <Button 
-              color="secondary" 
-              onClick={setModal(false)}
-            >
-              Cancel
-            </Button>
+            <Button color="primary" onClick={() => onSaveFormPost()}>Save</Button>{' '}
+            <Button color="secondary" onClick={() => setModal(false)}>Cancel</Button>
           </ModalFooter>
         </Modal>
-        : <></>
-      }
-
+      </div>      
     </div>
   );
 };

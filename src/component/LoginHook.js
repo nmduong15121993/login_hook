@@ -13,6 +13,8 @@ import {
 // component
 import { Admin } from "./../component/Private/Admin/Admin";
 
+import { toast } from 'react-toastify';
+
 const LoginHook = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -30,8 +32,20 @@ const LoginHook = () => {
         }
         setAccountInfo(dataUser);
         setLogin(true);
+        toast.success('Login Successfully', {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true
+          });
       } catch (error) {
         setError(error.toString());
+        toast.error(`Login Failer with error code: ${error.toString()}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true
+          });
       } finally {
       }
     };
@@ -40,6 +54,7 @@ const LoginHook = () => {
 
   const onLogoutSuccess = () => {
     setAccountInfo("");
+    setPassword("");
     setLogin(false);
     localStorage.removeItem("account");
   };
