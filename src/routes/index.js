@@ -21,9 +21,16 @@ const AuthRouter = () => {
             <Route path="/login">
               <LoginHook />
             </Route>
-            <PrivateRoute path="/admin">
-              <Admin />
+            <PrivateRoute path="/admin" exact>
+              <Switch>
+                <Route path="/" exact>
+                  <Admin />
+                </Route>
+              </Switch>
             </PrivateRoute>
+            <Route path="/" exact>
+              <h1>hello</h1>
+            </Route>
           </Switch>
         </div>
       </Router>

@@ -109,8 +109,7 @@ const Admin = () => {
       <Container>
         <Row>
           <Col xs="6">
-            <h1>Username Info:</h1>
-            <h5>ID: {accountInfo.id}</h5>
+            <h1>Username Info:</h1>            <h5>ID: {accountInfo.id}</h5>
             <h5>Username: {accountInfo.username}</h5>
             <h5>Role: {accountInfo.role}</h5>
           </Col>
