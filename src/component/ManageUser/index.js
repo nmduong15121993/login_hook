@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Table, Collapse, Label, Input, Card } from "reactstrap";
 import { useHistory } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { user } from "../../mooks";
 import "../Layout/css/ManageUser.css";
-import { toast } from 'react-toastify';
+import { THead } from './components/THead';
 
 const ManageUser = () => {
   const history = useHistory();
@@ -44,20 +45,10 @@ const ManageUser = () => {
   }
   //========== Save Add User =========
   const saveAddUser = () => {
-    const newDataForm = {...dataForm};
-    const {id, username, password, role} = newDataForm;
-    const newAllUser = [...allUser];
     const addUser = async () => {
       try {
-        const sendUser = {
-          id: id,
-          username: username,
-          password: password,
-          role: role
-        }
-        const add = await user.addUser(sendUser);
-        newAllUser.push(add);
-        setAllUser(newAllUser);
+        const newUser = await user.addUser(dataForm);
+        setAllUser(allUser.concat(newUser));
         toast.success("Add User Successfully", {autoClose: 2000});
       } catch (error) {
         toast.error(`Add User Failed: ${error}`, {autoClose: 3000});
@@ -71,16 +62,14 @@ const ManageUser = () => {
   }
   //========== Save Edit User =========
   const saveEditUser = () => {
-    const newDataForm = {...dataForm};
-    const newAllUser = [...allUser];
     const editUser = async () => {
       try {
-        const editData = await user.editUser(newDataForm);
+        const editData = await user.editUser(dataForm);
         if(!editData) return undefined;
         const { id } = editData;
-        const ind = newAllUser.findIndex((item) => item.id === id);
-        newAllUser[ind] = newDataForm;
-        setAllUser([...newAllUser]);
+        const ind = allUser.findIndex((item) => item.id === id);
+        allUser[ind] = editData;
+        setAllUser([...allUser]);
         toast.success("Add User Successfully", {autoClose: 2000});
       } catch (error) {
         toast.error(`Add User Failed: ${error}`, {autoClose: 3000});
@@ -100,14 +89,11 @@ const ManageUser = () => {
   }
   //========== Delete User ===========
   const handleDelete = (id) => {
-    console.log(id);
-    const newAllUser = [...allUser];
     const delUser = async () => {
       try {
         const userDel = await user.removeUser(id);
-        const ind = newAllUser.findIndex((item) => item.id === userDel.id);
-        newAllUser.splice(ind, 1);
-        setAllUser(newAllUser);
+        const newUser = allUser.filter((item) => item.id !== userDel.id);
+        setAllUser(newUser);
         toast.success("Deleted Successfully", {autoClose: 2000});
       } catch (error) {
         toast.error(`Delete Failed: ${error}`, {autoClose: 3000});
@@ -195,15 +181,7 @@ const ManageUser = () => {
 
       {/*========= Table Display List User ==========*/}
       <Table bordered striped >
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Avatar</th>
-            <th>Username</th>
-            <th>Role</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        <THead />
         <tbody>
           {
             allUser.map((user) => {

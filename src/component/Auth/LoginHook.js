@@ -24,7 +24,7 @@ const LoginHook = () => {
       setRedirect(true);
       toast.success("Login Successfully", {autoClose: 2000});
     } catch (error) {
-      dispatch(setError({ error }));
+      dispatch(setError(error));
       toast.error(`Login Failed: ${error}`, {autoClose: 2000});
     }
   };

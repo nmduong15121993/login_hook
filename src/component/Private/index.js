@@ -12,7 +12,7 @@ function PrivateRoute({ children, ...rest }) {
   return (
     <Route
       {...rest}
-      render={({ location }) =>
+      render={() =>
         store.ind > -1 ? (
           children
         ) : (

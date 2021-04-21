@@ -18,6 +18,11 @@ import { user, feeds } from "./../../../mooks";
 import { AuthContext } from '../../../store';
 import { logoutAction, setError } from "../../../store/user/action";
 import { useHistory } from 'react-router-dom';
+/**
+ * Tách code
+ * Viết thành class component
+ */
+
 
 const Admin = () => {
   const history = useHistory();
@@ -29,7 +34,8 @@ const Admin = () => {
     img: '',
     description: '',
     detail: ''
-  }
+  };
+
   const { store, dispatch } = React.useContext(AuthContext);
   // const accountInfo = await user.getUser(store.ind);
 
@@ -41,8 +47,13 @@ const Admin = () => {
 
   React.useEffect(() => {
     const fnPromise = async () => {
+      if (store.ind < 0) return;
       try {
-        const dataFeed = await feeds.getFeeds();
+        const [dataFeed, InfoAcc] = await Promise.all([
+          feeds.getFeeds(),
+          user.getUser(store.ind),
+        ]);
+        setAccountInfo(InfoAcc);
         setDataFeeds(dataFeed);
       } catch (error) {
         console.log(error);
@@ -50,19 +61,7 @@ const Admin = () => {
       }
     };
     fnPromise();
-  }, []);
-
-  React.useEffect(() => {
-    const getInfoUser = async () => {
-      try {
-        const InfoAcc = await user.getUser(store.ind);
-        setAccountInfo(InfoAcc);
-      } catch (error) {
-        dispatch(setError(error));
-      }
-    }
-    getInfoUser();
-  }, [store, dispatch]);
+  }, [store.ind]);
 
   // =============== Logout ===============
   const handleLogout = () => {
@@ -92,38 +91,27 @@ const Admin = () => {
     setModal(true);
   }
 
-  const onSaveFormPost = () => {
+  const onSaveFormPost = async () => {
     const { id, idAuther, title, img, description, detail} = dataForm;
-
-    if(id) {
-      const editPost = async () => {
-        try {
-          const data = await feeds.editFeed(dataForm);
-          const index =  dataFeeds.findIndex((dataEdit) => dataEdit.id === data.id);
-          dataFeeds[index] = data;
-          setDataFeeds([...dataFeeds]);
-          toast.success("Updated Post Successfully", {autoClose: 2000});
-        } catch (error) {
-          console.log(error);
-          toast.error(`Update Post Failer with error code: ${error}`, {autoClose: 5000});
-        }
-      };
-      editPost();    
-    }else {
-      const addPost = async () => {
-        try {
-          const data = await feeds.addFeed({idAuther, title, img, description, detail});
-          setDataFeeds([...dataFeeds, data]);
-          toast.success("Created Post Successfully", {autoClose: 2000});
-        } catch (error) {
-          console.log(error);
-          toast.error(`Create Failer with error code: ${error}`, {autoClose: 5000});
-        }
-      };
-      addPost();      
+    try {
+      if(id) {
+        const data = await feeds.editFeed(dataForm);
+        const index =  dataFeeds.findIndex((dataEdit) => dataEdit.id === data.id);
+        dataFeeds[index] = data;
+        setDataFeeds([...dataFeeds]);
+        toast.success("Updated Post Successfully", {autoClose: 2000});
+      } else {
+        const data = await feeds.addFeed({idAuther, title, img, description, detail});
+        setDataFeeds([...dataFeeds, data]);
+        toast.success("Created Post Successfully", {autoClose: 2000});
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(`Update Post Failer with error code: ${error}`, {autoClose: 5000});
+    } finally {
+      setDataForm(dataFormEmty);
+      setModal(false);
     }
-    setDataForm(dataFormEmty);
-    setModal(false);
   }
 
   return (
