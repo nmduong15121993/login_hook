@@ -10,13 +10,18 @@ import {
   ModalFooter,
   Input
 } from "reactstrap";
+import "./../../Layout/css/Admin.css";
 
 import React from "react";
 import { toast } from 'react-toastify';
 import { user, feeds } from "./../../../mooks";
 import { AuthContext } from '../../../store';
+import { logoutAction, setError } from "../../../store/user/action";
+import { useHistory } from 'react-router-dom';
 
 const Admin = () => {
+  const history = useHistory();
+
   const dataFormEmty = {
     id: null,
     idAuther: null,
@@ -25,19 +30,20 @@ const Admin = () => {
     description: '',
     detail: ''
   }
-  const { store } = React.useContext(AuthContext);
-  const accountInfo = user.getUser(store.ind);
+  const { store, dispatch } = React.useContext(AuthContext);
+  // const accountInfo = await user.getUser(store.ind);
 
   const [dataFeeds, setDataFeeds] = React.useState([]);
   const [modal, setModal] = React.useState(false);
   const [titleForm, setTitleForm] = React.useState('');
   const [dataForm, setDataForm] = React.useState(dataFormEmty);
+  const [accountInfo, setAccountInfo] = React.useState({});
 
   React.useEffect(() => {
     const fnPromise = async () => {
       try {
-        const dataFeeds = await feeds.getFeeds();
-        setDataFeeds(dataFeeds);
+        const dataFeed = await feeds.getFeeds();
+        setDataFeeds(dataFeed);
       } catch (error) {
         console.log(error);
       } finally {
@@ -46,7 +52,24 @@ const Admin = () => {
     fnPromise();
   }, []);
 
+  React.useEffect(() => {
+    const getInfoUser = async () => {
+      try {
+        const InfoAcc = await user.getUser(store.ind);
+        setAccountInfo(InfoAcc);
+      } catch (error) {
+        dispatch(setError(error));
+      }
+    }
+    getInfoUser();
+  }, [store, dispatch]);
 
+  // =============== Logout ===============
+  const handleLogout = () => {
+    dispatch(logoutAction(store.ind));
+    toast.success("Logout Successfully", {autoClose: 2000});
+  }
+  // =============== Delete Post ===============
   const onHandleDelete = async (id) => {
     try {
       const idDeleted = await feeds.removeFeed(id);
@@ -57,7 +80,7 @@ const Admin = () => {
       toast.error(`Delete Post Failer with error code: ${error}`, {autoClose: 5000});
     }
   }
-
+  // =============== Create and Edit Post ===============
   const onCreatePost = () => {
     setTitleForm("Create Post");
     setModal(true);
@@ -99,84 +122,102 @@ const Admin = () => {
       };
       addPost();      
     }
-    
     setDataForm(dataFormEmty);
     setModal(false);
   }
 
   return (
     <div>
-      <Container>
+      <Container className="user-info">
         <Row>
+          {/* =============== Info Account =============== */}
           <Col xs="6">
-            <h1>Username Info:</h1>
+            <h4 style={{color: "blue"}}>User Info</h4>
             <h5>ID: {accountInfo.id}</h5>
             <h5>Username: {accountInfo.username}</h5>
             <h5>Role: {accountInfo.role}</h5>
+
+            {/* Action User */}
+            <Button
+              color="primary"
+              onClick={() => history.replace("/manage_user")}
+            >
+              Manage User
+            </Button>
+
           </Col>
+          {/* =============== Logout =============== */}
           <Col xs="6">
-            <Button onClick={() => {}} color="danger">
+            <Button 
+              onClick={ handleLogout } 
+              color="danger"
+            >
               Log Out
             </Button>
           </Col>
         </Row>
       </Container>
-      <hr />
-      {accountInfo.role === "admin" ? (
-        <Button color="primary" onClick={() => onCreatePost()}>
-          Create POST
-        </Button>
-      ) : (
-        <></>
-      )}
+      {/* =============== POST =============== */}
       {dataFeeds.map((data) => (
-        <Container key={data.id}>
+        <Container key={data.id} className="container-post">
           <Row>
             <Col xs="6">
-                <h1>Post number: {data.id}</h1>
-                <h2>Title: {data.title}</h2>
+                <div className="container-post-1">
+                  <div className="post">
+                    <h5>Post number: {data.id}</h5>
+                    <h6>Title: {data.title}</h6>
+                    <div>
+                      <Label>Description:</Label>
+                      <p>{data.description}</p>
+                    </div>
 
-                <img
-                  src={data.img}
-                  alt="Img of Post"
-                  style={{ opacity: ".8", width: "30%", height: "30%" }}
-                />
+                    <div>
+                      <Label>Detail:</Label>
+                      <p>{data.detail}</p>
+                    </div>
+                  </div>
 
-                <div>
-                  <Label>Description:</Label>
-                  <p>{data.description}</p>
-                </div>
-
-                <div>
-                  <Label>Detail:</Label>
-                  <p>{data.detail}</p>
+                  <div className="sidebar">
+                    <img
+                      src={data.img}
+                      alt="Img of Post"
+                      style={{ opacity: ".8", width: "30%", height: "30%" }}
+                    />
+                  </div>
                 </div>
 
                 {accountInfo.role === "admin" ? ( 
                     <div>
                       <Button 
-                        color="secondary" 
+                        color="primary"
+                        onClick={() => onCreatePost()}
+                      >
+                        Create POST
+                      </Button>
+
+                      <Button 
+                        color="secondary"
+                        className="mg-l-3" 
                         onClick={() => onHandleEdit(data)}
                       >
                         Edit Post
                       </Button>
                       <Button 
-                        color="danger" 
+                        color="danger"
+                        className="mg-l-3"  
                         onClick={() => onHandleDelete(data.id)}
                       >
                         Delete Post
                       </Button>
                     </div>
 
-                     ) : (
-                    <></>
-                )}
-                <hr />
+                     ) : (<></>)}
             </Col>
           </Row>
         </Container>
       ))}
 
+      {/* =============== Form Dialog POST =============== */}
       <div>
         <Modal isOpen={modal}>
           <ModalHeader toggle={() => setModal(false)}>{titleForm}</ModalHeader>

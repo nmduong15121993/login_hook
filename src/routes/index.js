@@ -12,16 +12,21 @@ import { LoginHook } from '../component/Auth/LoginHook';
 // Protected router
 import { Admin } from '../component/Private/Admin';
 
+import {ManageUser} from "../component/ManageUser";
+
 const AuthRouter = () => {
   return (
     <ProvideAuth>
       <Router>
         <div>
           <Switch>
+            <Route path="/manage_user">
+              <ManageUser />
+            </Route>
             <Route path="/login">
               <LoginHook />
             </Route>
-            <PrivateRoute path="/admin">
+            <PrivateRoute path="/">
               <Admin />
             </PrivateRoute>
           </Switch>

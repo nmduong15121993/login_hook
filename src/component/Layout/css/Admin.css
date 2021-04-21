@@ -1,0 +1,36 @@
+
+.user-info {
+  width: 960px;
+  border: 1px solid #333;
+  padding: 10px;
+  margin-top: 5px;
+  background-color: aquamarine;
+}
+
+.container-post {
+  width: 960px;
+  border: 1px solid #333;
+  padding: 10px;
+  
+}
+
+.container-post-1 {
+  width: 960px;
+  padding: 10px;
+}
+
+.post {
+  width: 550px;
+  height: auto;
+  float: left;
+}
+
+.sidebar {
+  width: 300px;
+  height: auto;
+  float: right;
+ }
+
+ .mg-l-3 {
+   margin-left: 3px;
+ }

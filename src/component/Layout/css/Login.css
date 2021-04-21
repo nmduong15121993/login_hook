@@ -1,0 +1,32 @@
+.form-login {
+  background-image: url("https://anhdepblog.com/wp-content/uploads/2020/10/tai-hinh-nen-phong-canh-dep-cho-may-tinh-4.jpg");
+  position: fixed;
+  min-width: 100%;
+  min-height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.form-login-1 {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center; 
+}
+
+.form-login-2 {
+  align-self: center;
+  margin: auto;
+  width: 300px;
+  height: auto;
+  background-color: burlywood;
+  /* opacity: 0.2; */
+}
+
+.mg-5 {
+  margin: 5px;
+}
+
+.submit-login {
+  margin: 6px;
+}

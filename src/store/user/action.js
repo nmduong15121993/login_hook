@@ -1,9 +1,6 @@
 import { USER } from './type';
 
-const loginAction = ({ id }) => ({
-  type: USER.LOGIN,
-  id,
-});
+const loginAction = ({ id }) => ({type: USER.LOGIN, id,});
 
 const logoutAction = (id) => ({ type: USER.LOG_OUT, id });
 

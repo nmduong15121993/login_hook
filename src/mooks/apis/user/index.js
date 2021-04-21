@@ -6,6 +6,11 @@ class User {
     this.user = userData;
   }
 
+  getAllUser() {
+    if (!this.user) return undefined;
+    return fakePromise(this.user);
+  }
+
   getUser(ind) {
     if (ind < 0) return undefined;
     return fakePromise(this.user[ind]);
@@ -19,11 +24,17 @@ class User {
     return fakePromise(ind);
   }
 
-  addUser({ id, username, password }) {
-    this.user.push({ id, username, password });
-    return fakePromise({ id, username });
+  addUser({ id, username, password, role }) {
+    this.user.push({ id, username, password, role });
+    return fakePromise({ id, username, role });
   }
-
+  
+  editUser(data) {
+    const { id } = data;
+    const ind = this.user.findIndex((item) => item.id === id);
+    this.user[ind] = {...this.user[ind], ...data};
+    return fakePromise(this.user[ind]);
+  }
   removeUser(id) {
     const ind = this.user.findIndex((item) => item.id === id);
     if (ind < 0) throw new Error('Not found user !');
