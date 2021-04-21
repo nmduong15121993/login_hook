@@ -26,7 +26,7 @@ const AuthRouter = () => {
             <Route path="/login">
               <LoginHook />
             </Route>
-            <PrivateRoute path="/">
+            <PrivateRoute path="/" exact>
               <Admin />
             </PrivateRoute>
           </Switch>
