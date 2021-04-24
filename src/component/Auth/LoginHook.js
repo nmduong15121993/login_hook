@@ -14,8 +14,7 @@ const LoginHook = () => {
   const [remember, setRemember] = useState(false);
   const [redirect, setRedirect] = useState(false);
 
-  const { store, dispatch } = React.useContext(AuthContext);
-  const { error } = store;
+  const { dispatch } = React.useContext(AuthContext);
 
   const logIn = async () => {
     try {
@@ -73,11 +72,11 @@ const LoginHook = () => {
                 Check me out
               </Label>
             </FormGroup>
-
+            
             <Button onClick={logIn} className="submit-login">Login</Button>
           </Form>
         </div>
-        <div style={{ color: "red" }}>{error}</div>
+        
       </div>
     </div>
   );

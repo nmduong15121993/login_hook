@@ -19,8 +19,8 @@ class User {
   getUserName(username, password) {
     const ind = this.user.findIndex((item) => item.username === username);
 
-    if (ind < 0) return fakePromise(undefined, 'username sai');
-    if (this.user[ind].password !== password) return fakePromise(undefined, 'password sai');
+    if (ind < 0) return fakePromise(undefined, 'username invalid !!! Please try again.');
+    if (this.user[ind].password !== password) return fakePromise(undefined, 'password invalid !!! Please try again.');
     return fakePromise(ind);
   }
 

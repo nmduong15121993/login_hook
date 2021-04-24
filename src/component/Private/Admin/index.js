@@ -1,31 +1,14 @@
-import {
-  Button,
-  Col,
-  Container,
-  Label,
-  Row,
-  Modal,
-  ModalHeader,
-  ModalBody, 
-  ModalFooter,
-  Input
-} from "reactstrap";
-import "./../../Layout/css/Admin.css";
-
 import React from "react";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, Label } from "reactstrap";
+import "./../../Layout/css/Admin.css";
 import { toast } from 'react-toastify';
 import { user, feeds } from "./../../../mooks";
 import { AuthContext } from '../../../store';
-import { logoutAction, setError } from "../../../store/user/action";
-import { useHistory } from 'react-router-dom';
-/**
- * Tách code
- * Viết thành class component
- */
-
+import { logoutAction } from "../../../store/user/action";
+import { Header } from './components/Header';
+import { Post } from './components/Post';
 
 const Admin = () => {
-  const history = useHistory();
 
   const dataFormEmty = {
     id: null,
@@ -35,9 +18,7 @@ const Admin = () => {
     description: '',
     detail: ''
   };
-
   const { store, dispatch } = React.useContext(AuthContext);
-  // const accountInfo = await user.getUser(store.ind);
 
   const [dataFeeds, setDataFeeds] = React.useState([]);
   const [modal, setModal] = React.useState(false);
@@ -68,28 +49,28 @@ const Admin = () => {
     dispatch(logoutAction(store.ind));
     toast.success("Logout Successfully", {autoClose: 2000});
   }
-  // =============== Delete Post ===============
-  const onHandleDelete = async (id) => {
-    try {
-      const idDeleted = await feeds.removeFeed(id);
-      setDataFeeds(dataFeeds.filter((item) => item.id !== idDeleted));
-      toast.success("Deleted Post Successfully", {autoClose: 2000});
-    } catch (error) {
-      console.log(error);
-      toast.error(`Delete Post Failer with error code: ${error}`, {autoClose: 5000});
+  // =============== Action ADD, EDIT, DELETE ===============
+  const handleActionPost = async (action, id = null) => {
+    if(action === 'ADD') {
+      setTitleForm("Create Post");
+      setModal(true);
     }
-  }
-  // =============== Create and Edit Post ===============
-  const onCreatePost = () => {
-    setTitleForm("Create Post");
-    setModal(true);
-  }
-
-  const onHandleEdit = (data) => {
-    setTitleForm("Edit Post");
-    setDataForm(data);
-    setModal(true);
-  }
+    if(action === 'EDIT') {
+      setTitleForm("Edit Post");
+      // setDataForm(data);
+      setModal(true);
+    }
+    if(action === 'DELETE') {
+      try {
+        const idDeleted = await feeds.removeFeed(id);
+        setDataFeeds(dataFeeds.filter((item) => item.id !== idDeleted));
+        toast.success("Deleted Post Successfully", {autoClose: 2000});
+      } catch (error) {
+        console.log(error);
+        toast.error(`Delete Post Failer with error code: ${error}`, {autoClose: 5000});
+      }
+    }
+  }; 
 
   const onSaveFormPost = async () => {
     const { id, idAuther, title, img, description, detail} = dataForm;
@@ -116,94 +97,18 @@ const Admin = () => {
 
   return (
     <div>
-      <Container className="user-info">
-        <Row>
-          {/* =============== Info Account =============== */}
-          <Col xs="6">
-            <h4 style={{color: "blue"}}>User Info</h4>
-            <h5>ID: {accountInfo.id}</h5>
-            <h5>Username: {accountInfo.username}</h5>
-            <h5>Role: {accountInfo.role}</h5>
+    {/* =============== Header ============= */}
+      <Header 
+        accountInfo={accountInfo} 
+        handleLogout={handleLogout}
+      />
 
-            {/* Action User */}
-            <Button
-              color="primary"
-              onClick={() => history.replace("/manage_user")}
-            >
-              Manage User
-            </Button>
-
-          </Col>
-          {/* =============== Logout =============== */}
-          <Col xs="6">
-            <Button 
-              onClick={ handleLogout } 
-              color="danger"
-            >
-              Log Out
-            </Button>
-          </Col>
-        </Row>
-      </Container>
-      {/* =============== POST =============== */}
-      {dataFeeds.map((data) => (
-        <Container key={data.id} className="container-post">
-          <Row>
-            <Col xs="6">
-                <div className="container-post-1">
-                  <div className="post">
-                    <h5>Post number: {data.id}</h5>
-                    <h6>Title: {data.title}</h6>
-                    <div>
-                      <Label>Description:</Label>
-                      <p>{data.description}</p>
-                    </div>
-
-                    <div>
-                      <Label>Detail:</Label>
-                      <p>{data.detail}</p>
-                    </div>
-                  </div>
-
-                  <div className="sidebar">
-                    <img
-                      src={data.img}
-                      alt="Img of Post"
-                      style={{ opacity: ".8", width: "30%", height: "30%" }}
-                    />
-                  </div>
-                </div>
-
-                {accountInfo.role === "admin" ? ( 
-                    <div>
-                      <Button 
-                        color="primary"
-                        onClick={() => onCreatePost()}
-                      >
-                        Create POST
-                      </Button>
-
-                      <Button 
-                        color="secondary"
-                        className="mg-l-3" 
-                        onClick={() => onHandleEdit(data)}
-                      >
-                        Edit Post
-                      </Button>
-                      <Button 
-                        color="danger"
-                        className="mg-l-3"  
-                        onClick={() => onHandleDelete(data.id)}
-                      >
-                        Delete Post
-                      </Button>
-                    </div>
-
-                     ) : (<></>)}
-            </Col>
-          </Row>
-        </Container>
-      ))}
+    {/* =============== POST =============== */}
+      <Post 
+        dataFeeds={dataFeeds}
+        accountInfo={accountInfo}
+        handleActionPost={handleActionPost}
+      />
 
       {/* =============== Form Dialog POST =============== */}
       <div>

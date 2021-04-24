@@ -11,7 +11,6 @@ const userReducer = (state, action) => {
   
   switch (action.type) {
     case USER.LOGIN: {
-      console.log('login')
       const { id } = action;
       return mergeState({ ind: id });
     }
