@@ -50,7 +50,7 @@ const Admin = () => {
     toast.success("Logout Successfully", {autoClose: 2000});
   }
   // =============== Action ADD, EDIT, DELETE ===============
-  const handleActionPost = async (action, id = null) => {
+  const handleActionPost = async (action, id) => {
     if(action === 'ADD') {
       setTitleForm("Create Post");
       setModal(true);
