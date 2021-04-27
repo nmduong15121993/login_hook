@@ -9,7 +9,11 @@ import { Header } from './components/Header';
 import { Post } from './components/Post';
 
 const Admin = () => {
+  const { store, dispatch } = React.useContext(AuthContext);
 
+  const [dataFeeds, setDataFeeds] = React.useState([]);
+  const [modal, setModal] = React.useState(false);
+  const [titleForm, setTitleForm] = React.useState('');
   const dataFormEmty = {
     id: null,
     idAuther: null,
@@ -18,11 +22,6 @@ const Admin = () => {
     description: '',
     detail: ''
   };
-  const { store, dispatch } = React.useContext(AuthContext);
-
-  const [dataFeeds, setDataFeeds] = React.useState([]);
-  const [modal, setModal] = React.useState(false);
-  const [titleForm, setTitleForm] = React.useState('');
   const [dataForm, setDataForm] = React.useState(dataFormEmty);
   const [accountInfo, setAccountInfo] = React.useState({});
 
@@ -44,32 +43,44 @@ const Admin = () => {
     fnPromise();
   }, [store.ind]);
 
-  // =============== Logout ===============
   const handleLogout = () => {
     dispatch(logoutAction(store.ind));
     toast.success("Logout Successfully", {autoClose: 2000});
   }
-  // =============== Action ADD, EDIT, DELETE ===============
+
+  const onCloseModal = () => {
+    setTitleForm('');
+    setDataForm(dataFormEmty);
+    setModal(false);
+  };
+
   const handleActionPost = async (action, id) => {
-    if(action === 'ADD') {
-      setTitleForm("Create Post");
-      setModal(true);
-    }
-    if(action === 'EDIT') {
-      setTitleForm("Edit Post");
-      // setDataForm(data);
-      setModal(true);
-    }
-    if(action === 'DELETE') {
-      try {
-        const idDeleted = await feeds.removeFeed(id);
-        setDataFeeds(dataFeeds.filter((item) => item.id !== idDeleted));
-        toast.success("Deleted Post Successfully", {autoClose: 2000});
-      } catch (error) {
-        console.log(error);
-        toast.error(`Delete Post Failer with error code: ${error}`, {autoClose: 5000});
-      }
-    }
+    switch (action) {
+      case 'ADD':
+        setTitleForm("Create Post");
+        setModal(true);
+        break;
+
+      case 'EDIT':
+        setTitleForm("Edit Post");
+        const ind = dataFeeds.findIndex((post) => post.id === id);
+        setDataForm(dataFeeds[ind]);
+        setModal(true);
+        break;
+
+      case 'DELETE':
+        try {
+          const idDeleted = await feeds.removeFeed(id);
+          setDataFeeds(dataFeeds.filter((item) => item.id !== idDeleted));
+          toast.success("Deleted Post Successfully", {autoClose: 2000});
+        } catch (error) {
+          toast.error(`Delete Post Failer with error code: ${error}`, {autoClose: 5000});
+        }
+        break;
+
+      default:
+        break;
+    };
   }; 
 
   const onSaveFormPost = async () => {
@@ -87,33 +98,32 @@ const Admin = () => {
         toast.success("Created Post Successfully", {autoClose: 2000});
       }
     } catch (error) {
-      console.log(error);
       toast.error(`Update Post Failer with error code: ${error}`, {autoClose: 5000});
     } finally {
-      setDataForm(dataFormEmty);
-      setModal(false);
+      onCloseModal();
     }
-  }
+  };
 
   return (
     <div>
-    {/* =============== Header ============= */}
       <Header 
         accountInfo={accountInfo} 
         handleLogout={handleLogout}
       />
 
-    {/* =============== POST =============== */}
-      <Post 
-        dataFeeds={dataFeeds}
-        accountInfo={accountInfo}
-        handleActionPost={handleActionPost}
-      />
+      { dataFeeds.map((post) => (
+          <Post
+          key={post.id}  
+          post={post}
+          accountInfo={accountInfo}
+          handleActionPost={(action) => handleActionPost(action, post.id)}
+        />
+      ))}
 
       {/* =============== Form Dialog POST =============== */}
       <div>
         <Modal isOpen={modal}>
-          <ModalHeader toggle={() => setModal(false)}>{titleForm}</ModalHeader>
+          <ModalHeader toggle={onCloseModal}>{titleForm}</ModalHeader>
           <ModalBody>
             <form>
               <div>
@@ -167,11 +177,11 @@ const Admin = () => {
                 />
               </div>
             </form>
-
           </ModalBody>
+
           <ModalFooter>
-            <Button color="primary" onClick={() => onSaveFormPost()}>Save</Button>{' '}
-            <Button color="secondary" onClick={() => setModal(false)}>Cancel</Button>
+            <Button color="primary" onClick={() => onSaveFormPost()}>Save</Button>
+            <Button color="secondary" onClick={onCloseModal}>Cancel</Button>
           </ModalFooter>
         </Modal>
       </div>      

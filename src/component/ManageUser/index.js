@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Table } from "reactstrap";
-import { useHistory } from 'react-router-dom';
-// import { toast } from 'react-toastify';
+import { Table } from "reactstrap";
+import { toast } from 'react-toastify';
 import { user } from "../../mooks";
 import "../Layout/css/ManageUser.css";
 
 // Component
+import { Header } from './components/Header';
 import { THead } from './components/THead';
 import { TBody } from './components/TBody';
 import { FormUser } from './components/FormUser';
 
 const ManageUser = () => {
-  const history = useHistory();
   const [allUser, setAllUser] = useState([]);
-  const [titleForm, setTitleForm] = useState("");
-  const [initUser, setInitUser] = React.useState({
+  const initUser = {
     id: null,
     username: "",
     password: "",
     role: ""
-  });
+  };
+  const [dataForm, setDataForm] = useState(initUser);
+  const [titleForm, setTitleForm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const getAllUsers = async () => {
@@ -33,37 +34,80 @@ const ManageUser = () => {
     getAllUsers();
   }, []);
 
+  const onCloseForm = () => {
+    setTitleForm("");
+    setDataForm(initUser);
+    setIsOpen(false);
+  };
+
+  const saveFormUser = async () => {
+    try {
+      if(titleForm === 'Add User') {
+        const allUsers = [...allUser];
+        const newUser = await user.addUser(dataForm);
+        setAllUser(allUsers.concat(newUser));
+        toast.success("Add User Successfully", {autoClose: 2000});
+      };
+      if(titleForm === 'Edit User') {
+        const editData = await user.editUser(dataForm);
+        if(!editData) return undefined;
+        const { id } = editData;
+        const ind = allUser.findIndex((item) => item.id === id);
+        allUser[ind] = editData;
+        setAllUser([...allUser]);
+        toast.success("Edit User Successfully", {autoClose: 2000});
+      };
+    } catch (error) {
+      toast.error(`Failed: ${error}`, {autoClose: 3000});
+    } finally {
+      onCloseForm();
+    }
+  };
+
   const handleActionUser = (action, id) => {
-    console.log({ action, id });
     switch (action) {
       case 'EDIT': {
-
+        const ind = allUser.findIndex((item) => item.id === id);
+        setDataForm(allUser[ind]);
+        setTitleForm("Edit User");
+        setIsOpen(true);
         break;
       }
       case 'DELETE': {
-
+        const delUser = async () => {
+          try {
+            const userDel = await user.removeUser(id);
+            const newUser = allUser.filter((item) => item.id !== userDel.id);
+            setAllUser(newUser);
+            toast.success("Deleted Successfully", {autoClose: 2000});
+          } catch (error) {
+            toast.error(`Delete Failed: ${error}`, {autoClose: 3000});
+          }
+        };
+        delUser();
         break;
       }
     
       default:
+        setTitleForm("Add User");
+        setIsOpen(true);
         break;
     }
-  }
+  };
 
   return (
     <div>
-      <Button 
-        onClick={() => history.push("/")} 
-        style={{margin: "4px"}}
-      >
-        Back Admin POST
-      </Button>
-      <h1>User List</h1>
+      <Header handleActionUser={handleActionUser} />
+
       <FormUser 
-        formInit={initUser}
+        isOpen={isOpen}
         titleForm={titleForm}
-        onSave={(newState) => setInitUser(newState)}
+        dataForm={dataForm}
+        setDataForm={setDataForm}
+        onCloseForm={onCloseForm}
+        saveFormUser={saveFormUser}
       />
+
       <Table bordered striped >
         <THead />
         <tbody>

@@ -73,7 +73,14 @@ const LoginHook = () => {
               </Label>
             </FormGroup>
             
-            <Button onClick={logIn} className="submit-login">Login</Button>
+            <Button 
+              color="primary"
+              style={{fontSize: "20px", fontWeight: "bold"}}
+              className="submit-login"
+              onClick={logIn} 
+            >
+              Login
+            </Button>
           </Form>
         </div>
         

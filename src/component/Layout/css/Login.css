@@ -20,7 +20,14 @@
   width: 300px;
   height: auto;
   background-color: burlywood;
-  /* opacity: 0.2; */
+  border: 1px solid grey;
+	border-radius: 10px;
+  /* opacity: 0.8; */
+
+}
+
+.form-login-2 h2 {
+  text-align: center;
 }
 
 .mg-5 {
@@ -29,4 +36,6 @@
 
 .submit-login {
   margin: 6px;
+  width: 286px;
+  text-align: center;
 }
