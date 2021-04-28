@@ -1,5 +1,13 @@
 import React from "react";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, Label } from "reactstrap";
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Label,
+} from "reactstrap";
 import "./../../Layout/css/Admin.css";
 import { toast } from 'react-toastify';
 import { user, feeds } from "./../../../mooks";
@@ -46,6 +54,7 @@ const Admin = () => {
   const handleLogout = () => {
     dispatch(logoutAction(store.ind));
     toast.success("Logout Successfully", {autoClose: 2000});
+    localStorage.setItem('login-status', '-1');
   }
 
   const onCloseModal = () => {
@@ -110,6 +119,13 @@ const Admin = () => {
         accountInfo={accountInfo} 
         handleLogout={handleLogout}
       />
+
+      <Button 
+        color="primary"
+        onClick={() => handleActionPost('ADD')}
+      >
+        Create POST
+      </Button>
 
       { dataFeeds.map((post) => (
           <Post

@@ -35,13 +35,6 @@ const Post = ({ post, accountInfo, handleActionPost }) => {
             {accountInfo.role === "admin" ? ( 
                 <div>
                   <Button 
-                    color="primary"
-                    onClick={() => handleActionPost('ADD')}
-                  >
-                    Create POST
-                  </Button>
-
-                  <Button 
                     color="secondary"
                     className="mg-l-3" 
                     onClick={() => handleActionPost('EDIT')}

@@ -13,18 +13,23 @@ const LoginHook = () => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [redirect, setRedirect] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { dispatch } = React.useContext(AuthContext);
 
   const logIn = async () => {
     try {
+      setLoading(true);
       const id = await user.getUserName(username, password);
       dispatch(loginAction({ id }));
       setRedirect(true);
       toast.success("Login Successfully", {autoClose: 2000});
+      localStorage.setItem('login-status', id);
     } catch (error) {
       dispatch(setError(error));
       toast.error(`Login Failed: ${error}`, {autoClose: 2000});
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,11 +80,11 @@ const LoginHook = () => {
             
             <Button 
               color="primary"
-              style={{fontSize: "20px", fontWeight: "bold"}}
-              className="submit-login"
-              onClick={logIn} 
+              style={{ fontSize: "20px", fontWeight: "bold" }}
+              className={`submit-login ${loading ? 'disabled' : ''}`}
+              onClick={!loading ? logIn : () => {}} 
             >
-              Login
+              { loading ? 'Loading...' : 'Login' }
             </Button>
           </Form>
         </div>
